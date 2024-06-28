@@ -1,0 +1,121 @@
+{% extends "index.html" %}
+{% block encabezado %}
+    {% include "encabezado.html" %}
+{% endblock %}
+{% block menu %}
+    {% include "administrador/menu.html" %}
+{% endblock %}
+{% block contenido %}
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.0.2/js/dataTables.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.0.2/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.1/js/dataTables.buttons.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.1/js/buttons.dataTables.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.1/js/buttons.print.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.dataTables.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.0.1/css/buttons.dataTables.css">
+
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.dataTables.css">
+
+<div class="container d-flex flex-column justify-content-center align-items-center gap-4">
+
+    <h3 class="text-center mt-3 fw-bold">Casos</h3>
+
+    <div>
+        <div class=" col-12 d-flex flex-column justify-content-center align-items-center gap-4 p-4">
+            <div>
+                <table id="tblProductos" class="table">
+                    <thead class="table-dark">
+                      <tr>
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Descripcion</th>
+                        <th scope="col">Oficina Ambiente</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Asignar</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for caso in listarCasos %}
+                        <tr>
+                            <td>{{caso.casSolicitud.solUsuario.first_name}} {{caso.casSolicitud.solUsuario.last_name}}</td>
+                            <td>{{caso.casSolicitud.solDescripcion}}</td>
+                            <td>{{caso.casSolicitud.solOficinaAmbiente.Nombre}}</td>
+                            <td>{{caso.casSolicitud.FechaHoraCreacion}}</td>
+                            <td>{{caso.casEstado}}</td>
+                            <td class="d-flex align-items-center justify-content-center"><i onclick="agregarIdCaso('{{caso.id}}')" id="btnAbrirModal" type="button" class="icon ion-android-checkmark-circle btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal"></i></td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+            </div>
+            <!-- Button to Open the Modal -->
+
+  
+  <!-- The Modal -->
+  <div class="modal" id="myModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Añadir Tecnico</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+  
+        <!-- Modal body -->
+        <div class="modal-body">
+          <form action="/asignarTecnicoCaso/" method="post">
+            {% csrf_token %}
+            <div class="d-flex flex-column gap-3">
+                <span><b> Tecnico de Soporte </b> </span>
+                <select name="cbTecnico" id="">
+                    <option hidden selected>Seleccione</option>
+                    {% for tecnico in tecnicos %}
+                    <option value="{{tecnico.id}}">{{tecnico.first_name}}{{tecnico.last_name}}</option>
+                    {% endfor %}
+                </select>
+                <input hidden name="idCaso" id="idCaso" type="text" >
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Asignar</button>
+              <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+          </form>
+        </div>
+  
+        <!-- Modal footer -->
+
+  
+      </div>
+    </div>
+  </div>
+        </div>
+        <script>
+            new DataTable('#tblProductos', {
+                layout: {
+                    topStart: {
+                        buttons: ['excel', 'pdf', 'print']
+                    }
+                }
+            });
+        </script>
+    </div>
+
+    
+
+</div>
+
+{% endblock %}
+
+{% block piePagina %}
+    {% include "piePagina.html" %}
+{% endblock %}

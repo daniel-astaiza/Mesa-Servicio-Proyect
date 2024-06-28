@@ -1,0 +1,55 @@
+{% extends "index.html" %}
+{% block encabezado %}
+{% include "encabezado.html" %}
+{% endblock%}
+{% block menu %}
+{% include "empleado/menu.html"%}
+{%endblock%}
+{% block contenido%}
+<h3 class="text-center mt-3 fw-bold"> REGISTRO DE SOLICITUD</h3>
+<div class="container mt-5">
+    <div class="row justify-content-center mt-5 was-validated">
+        <div class="card">
+            <div class="card-body">
+                <form action="/registrarSolicitud/" method="post" class="w-75" style="margin: 0 auto;">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripcion:</label>
+                        <textarea name="descripcion" class="form-control" id="" rows="3"
+                            placeholder="haga una descripción de lo que esta pasando"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="oficinaA" class="form-label">Oficina-Ambiente</label>
+                        <select name="oficinaA" class="form-select" id="">
+                            <option value="">Seleccione</option>
+                            {% for ofi in oficinaAmbientes %}
+                            <option value="{{ofi.id}}">{{ofi.Nombre}}</option>
+                            {% endfor%}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-success">Enviar</button>
+                        <button type="reset" class="btn btn-secondary">Camcelar</button>
+                    </div>
+                    <div>
+                        {{mensaje}}
+                    </div>
+
+
+                </form>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+
+    {%endblock%}
+    {% block piePagina %}
+    {% include 'piePagina.html' %}
+    {%endblock%}
