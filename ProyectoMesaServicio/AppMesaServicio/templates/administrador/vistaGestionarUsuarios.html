@@ -14,6 +14,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script> -->
 <script src="https://cdn.datatables.net/buttons/3.0.1/js/buttons.html5.min.js"></script>
+<script src="../../static/js/dataTable.js"></script>
+
 <!-- <script src="https://cdn.datatables.net/buttons/3.0.1/js/buttons.print.min.js"></script> -->
 <link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.dataTables.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.0.1/css/buttons.dataTables.css">
@@ -27,7 +29,7 @@
     <br>
     <table id="tblPersonas" class="table table-bordered table-hover">
         <thead>
-            <tr class="text-center verdeSena text-black">
+            <tr class="text-center  text-black">
                 <th>Nombre Completo</th>
                 <th>Correo Electronico</th>
                 <th>Tipo</th>              
@@ -55,17 +57,9 @@
         </tbody>
     </table>
 </div>
-
-
 <script>
-    new DataTable('#tblPersonas', {
-        layout: {
-            topStart: {
-                buttons: ['csv', 'excel', 'pdf']
-            }
-        }
-    });
-</script>
+    cargarDataTable($('#tblPersonas'), "RELACION DE USUARIOS", 3);
+  </script>
 {%endblock %}
 {% block piePagina %}
     {% include "piePagina.html" %}

@@ -19,6 +19,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 <script src="https://cdn.datatables.net/buttons/3.0.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/3.0.1/js/buttons.print.min.js"></script>
+<script src="../../static/js/dataTable.js"></script>
 
 <link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.dataTables.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.0.1/css/buttons.dataTables.css">
@@ -57,6 +58,9 @@
                     </tbody>
                   </table>
             </div>
+            <script>
+              cargarDataTable($('#tblProductos'), "RELACION DE USUARIOS", 3);
+            </script>
             <!-- Button to Open the Modal -->
 
   
@@ -99,15 +103,7 @@
     </div>
   </div>
         </div>
-        <script>
-            new DataTable('#tblProductos', {
-                layout: {
-                    topStart: {
-                        buttons: ['excel', 'pdf', 'print']
-                    }
-                }
-            });
-        </script>
+
     </div>
 
     

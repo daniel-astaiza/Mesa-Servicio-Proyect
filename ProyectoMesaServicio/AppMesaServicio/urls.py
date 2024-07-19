@@ -39,6 +39,8 @@ urlpatterns = [
     path('VistaRegistrarUsuario/',views.VistaRegistrarUsuario),
     path('RegistrarUsuario/',views.RegistrarUsuario),
     path('vistaGestionarUsuarios/',views.vistaGestionarUsuarios),
+    path('pdfSolicitudes/',views.generarPdfSolicitudes),
+    path('reportesEstadisticos/', views.estadisticas),
     path('recuperarClave/',views.recuperarClave),
 
     

@@ -8,8 +8,8 @@
 {% block contenido %}
 <br>
 <div class="d-flex justify-content-center align-items-center" style="margin-bottom: 7rem;">
-    <form id="frmRegistrarUsuario" action="/registrarUsuario/" method="post" enctype="multipart/form-data"
-        class="was-validated w-75">
+    <form id="frmRegistrarUsuario" action="/RegistrarUsuario/" method="post" enctype="multipart/form-data"
+        class=" w-75">
         {% csrf_token%}
         <h3 class="text-center fw-bold">REGISTRAR USUARIO</h3>
         <br>
@@ -34,7 +34,7 @@
                 <label for="cbTipo" class="fw-bold">Tipo Funcionario</label>
                 <select name="cbTipo" id="cbTipo" class="form-select" required>
                     <option value="">Seleccione</option>
-                    {% for tipo in tipoUsuario %}
+                    {% for tipo in tipos %}
                     <option value="{{ tipo.0 }}">{{ tipo.0 }}</option>
                     {% endfor %}
                 </select>

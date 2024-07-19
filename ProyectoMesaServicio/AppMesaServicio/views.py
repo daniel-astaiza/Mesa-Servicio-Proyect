@@ -297,7 +297,7 @@ def RegistrarUsuario(request):
             with transaction.atomic():
                 #crear un objeto tipo User
                 user=User(username=correo , first_name=nombres, 
-                          last_name=apellidos, email=correo , userTipo=tipo, userFoto=foto)
+                          last_name=apellidos, email=correo , UserTipo=tipo, UserFoto=foto)
                 user.save()
                 #obtener el rol de acuerdo con el id del rol
                 rol = Group.objects.get(pk=idRol)
@@ -316,16 +316,16 @@ def RegistrarUsuario(request):
                 retorno = {"mensaje": mensaje}
                 #aqui se envia el correo
                 asunto = 'Registro Sistema Mesa de Servicio CTPI-CAUCA'
-                mensaje = f'Cordial Saludo <b>{user.first_name} {user.last_name}</b> , nos permitimos\
-                    informarle que usted ha sido registrado en el sistema Mesa de servicio\
-                    del centro de Teleinformatica y Produccion Industrial CTPI de la ciudad blanca osea\
-                    Popayán con el Rol: <b>{rol.name}</b>.\
-                    <br> Nos permitimos enviarle las credenciales de Ingreso a nuestro Sistema . <br>\
+                mensaje = f'Cordial saludo, <b>{user.first_name} {user.last_name}</b>, nos permitimos \
+                    informarle que usted ha sido registrado en el Sistema de Mesa de Servicio \
+                    del Centro de Teleinformática y Producción Industrial CTPI de la ciudad de Popayán, \
+                    con el Rol: <b>{rol.name}</b>. \
+                    <br>Nos permitimos enviarle las credenciales de Ingreso a nuestro sistema.<br>\
                     <br><b>Username: </b> {user.username}\
-                    <br><b>password: </b> {passwordGenerado}\
-                    </b>.Lo invitamos a utilizar el aplicativo donde usted podrá \
-                    realizar solicitudes a la Mesa de Servicios del CTPI-CAUCA.\
-                    http://mesadeservicioctpicauca.sena.edu.co.'
+                    <br><b>Password: </b> {passwordGenerado}\
+                    <br><br>Lo invitamos a utilizar el aplicativo, donde podrá usted \
+                    realizar solicitudes a la mesa de servicio del Centro. Url del aplicativo: \
+                    http://mesadeservicioctpi.sena.edu.co.'
                 thread = threading.Thread(
                     target=enviarCorreo, args=(asunto, mensaje,[user.email]))
                 thread.start()
@@ -354,8 +354,9 @@ def generarPassword():
 def VistaRegistrarUsuario(request): 
     if request.user.is_authenticated:
         usuarios = User.objects.all()
+        roles = Group.objects.all()
         retorno = {"usuarios": usuarios, "user": request.user,
-                   "rol": request.user.groups.get().name}
+                   "roles": roles, 'tipos': tipoUsuario}
         return render(request, "administrador/frmRegistrarUsuario.html", retorno)
     else:
         mensaje = "Debe iniciar sesión"
@@ -402,9 +403,113 @@ def recuperarClave(request):
 
     return render(request, 'frmIniciarSesion.html', retorno)
 
-# def estadisticas(request):
-#     if request.user.is_authenticated:
+def estadisticas(request):
+    import matplotlib
+    if request.user.is_authenticated:
+        matplotlib.use('agg')
+        listaAmbientes = OficinaAmbinete.objects.all()
+        listaSolicitudes = Solicitudes.objects.all()
 
+        # grafico cantidad solicitudes por ambiente
+        solicitudesPorAmbiente = Solicitudes.objects.values('solOficinaAmbiente')\
+            .annotate(cantidad=Count('id'))
+        xAmbiente = []
+        yCantidadAmbiente = []
+        for ambiente in listaAmbientes:
+            for solicitud in listaSolicitudes:
+                if ambiente.id == solicitud.solOficinaAmbiente.id:
+                    xAmbiente.append(ambiente)
+                    yCantidadAmbiente.append(0)
+                    break
+        i = 0
+        colores = []
+        for ambiente in xAmbiente:
+            for solicitud in listaSolicitudes:
+                if ambiente.id == solicitud.solOficinaAmbiente.id:
+                    yCantidadAmbiente[i] += 1
+                    color = "#" + \
+                        ''.join([random.choice('0123456789ABCDEF')
+                                for j in range(6)])
+                    colores.append(color)
+            i += 1
+        textprops = {"fontsize": 6}
+        plt.title("Cantidad de Solicitudes Realizadas \n por Ambiente")
+        plt.pie(yCantidadAmbiente, labels=xAmbiente,
+                autopct="%0.1f %%", textprops=textprops, colors=colores)
+        rutaImagen = os.path.join(settings.MEDIA_ROOT + "\\" + "grafica1.png")
+        plt.savefig(rutaImagen)
+        plt.close()
+
+        # grafica cantidad solicitudes por mes
+        solicitudesPorMes = Solicitudes.objects.values(mes=ExtractMonth('FechaHoraCreacion'))\
+            .annotate(cantidad=Count('id'))
+        yCantidadMes = []
+        meses = []
+        textoMes = ['Enero', 'Febrero', 'Marzo',
+                    'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto']
+        colores = []
+        for solicitud in solicitudesPorMes:
+            meses.append(textoMes[solicitud['mes']-1])
+            yCantidadMes.append(solicitud['cantidad'])
+            color = "#" + \
+                ''.join([random.choice('0123456789ABCDEF')
+                         for j in range(6)])
+            colores.append(color)
+
+        textprops = {"fontsize": 10}
+        plt.title("Cantidad de Solicitudes Realizadas \n por Mes")
+        plt.bar(meses, yCantidadMes, color=colores)
+        rutaImagen = os.path.join(settings.MEDIA_ROOT + "\\" + "grafica2.png")
+        plt.savefig(rutaImagen)
+        plt.close()
+
+        '''
+        casosPorTipo = SolucionCasoTipoProcedimientos.objects.values(tipo='solTipoProcedimiento__tipNombre')\
+            .annotate(cantidad=Count('solSolucionCaso__id'))
+
+        yCantidadCasosTipo = []
+        tiposProcedimientos = []
+
+        tipos = TipoProcedimiento.objects.all()
+        for tipo in tipos:
+            tiposProcedimientos.append(tipo)
+            yCantidadCasosTipo.append(0)
+
+        i = 0
+        for caso in casosPorTipo:
+            for tipo in tipos:
+                if caso['tipo'] == tipo.tipNombre:
+                    yCantidadCasosTipo[i] += 1
+                    color = "#" + \
+                        ''.join([random.choice('0123456789ABCDEF')
+                                for j in range(6)])
+                    colores.append(color)
+            i += 1
+
+        textprops = {"fontsize": 6}
+        plt.title("Cantidad de Casos Atendidos \n por Tipo Procedimiento")
+        plt.bar(tiposProcedimientos, yCantidadCasosTipo, color=colores)
+        rutaImagen = os.path.join(settings.MEDIA_ROOT + "\\" + "grafica3.png")
+        plt.savefig(rutaImagen)
+        plt.close()
+        '''
+        return render(request, "administrador/reportesEstadisticos.html")
+
+    else:
+        mensaje = "Debe iniciar sesión"
+        return render (request, "frmIniciarSesion.html", {"mensaje":mensaje})
+
+
+def generarPdfSolicitudes(request):
+    from AppMesaServicio.pdfSolicitudes import Pdf
+    solicitudes = Solicitudes.objects.all()
+    doc = Pdf()
+    doc.alias_nb_pages()
+    doc.add_page()
+    doc.set_font("Arial", "B", 12)
+    doc.mostrarDatos(solicitudes)
+    doc.output(f'media/solicitudes.pdf')
+    return render(request, "administrador/mostrarPdf.html")
 
     
 def Salir(request):
