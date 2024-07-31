@@ -35,7 +35,7 @@ def login(request):
     user = authenticate(username=username, password=password)
     if user is not None:
         auth.login(request, user)
-        if user.groups.filter(name='administrador').exists():
+        if user.groups.filter(name='Administrador').exists():
             return redirect('/inicioAdministrador')
         elif user.groups.filter(name='tecnico').exists():
             return redirect('/inicioTecnico')
